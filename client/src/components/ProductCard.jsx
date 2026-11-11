@@ -1,11 +1,38 @@
 // client/src/components/ProductCard.jsx
-import React from 'react';
+import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom'; // Импортируем навигацию
+import { CartContext } from '../context/CartContext';
 
 const ProductCard = ({ product }) => {
+  const { addToCart } = useContext(CartContext);
+  const navigate = useNavigate(); // Хук для переадресации
+
+  // Новая функция с проверками
+  const handleAddToCart = () => {
+    const token = localStorage.getItem('token');
+    const userString = localStorage.getItem('user');
+    const user = userString ? JSON.parse(userString) : null;
+
+    // 1. Если не авторизован
+    if (!token) {
+      alert('Для покупки необходимо войти в систему или зарегистрироваться!');
+      navigate('/login');
+      return;
+    }
+
+    // 2. Если это админ или поставщик
+    if (user?.role !== 'user') {
+      alert('Только покупатели могут добавлять товары в корзину!');
+      return;
+    }
+
+    // 3. Если всё хорошо — добавляем
+    addToCart(product);
+  };
+
   return (
     <div style={styles.card}>
       <div style={styles.imagePlaceholder}>
-        {/* Пока заглушка, так как картинок в БД может не быть */}
         🎁
       </div>
       <div style={styles.content}>
@@ -13,7 +40,8 @@ const ProductCard = ({ product }) => {
         <p style={styles.description}>{product.description}</p>
         <div style={styles.footer}>
           <span style={styles.price}>{product.price} BYN</span>
-          <button style={styles.button}>В корзину</button>
+          {/* Вызываем нашу новую функцию */}
+          <button onClick={handleAddToCart} style={styles.button}>В корзину</button>
         </div>
       </div>
     </div>
@@ -22,19 +50,19 @@ const ProductCard = ({ product }) => {
 
 const styles = {
   card: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)', // Почти непрозрачный белый
-    backdropFilter: 'blur(5px)', // Легкое размытие фона позади карточки
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backdropFilter: 'blur(5px)',
     borderRadius: '20px',
     overflow: 'hidden',
-    boxShadow: '0 10px 25px rgba(255, 141, 161, 0.2)', // Чуть более заметная тень
+    boxShadow: '0 10px 25px rgba(255, 141, 161, 0.2)',
     display: 'flex',
     flexDirection: 'column',
     transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-    border: '1px solid rgba(255, 255, 255, 0.5)', // Тонкая светлая рамка
+    border: '1px solid rgba(255, 255, 255, 0.5)',
   },
   imagePlaceholder: {
     height: '160px',
-    backgroundColor: '#fdf5ff', // Очень светлый лавандовый
+    backgroundColor: '#fdf5ff',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -75,7 +103,7 @@ const styles = {
     color: '#fff',
     border: 'none',
     padding: '10px 18px',
-    borderRadius: '30px', // Круглая кнопка
+    borderRadius: '30px',
     cursor: 'pointer',
     fontWeight: '700',
     transition: 'background-color 0.3s ease',

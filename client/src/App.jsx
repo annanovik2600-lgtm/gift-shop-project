@@ -1,15 +1,20 @@
 // client/src/App.jsx
-import React from 'react';
+import React, { useContext } from 'react'; // <-- Добавили useContext
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import Catalog from './pages/Catalog';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminPanel from './pages/AdminPanel';
+import Cart from './pages/Cart'; // <-- Импорт страницы Корзины
+import { CartContext } from './context/CartContext'; // <-- Импорт контекста
 import logoImg from './assets/logo.png';
 
 function App() {
   const navigate = useNavigate();
   
+  // Получаем счетчик товаров из корзины
+  const { cartCount } = useContext(CartContext); // <-- Вот эта строка отвечает за цифру в шапке
+
   // Получаем данные пользователя из памяти браузера
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
@@ -32,6 +37,11 @@ function App() {
         <nav style={{ display: 'flex', alignItems: 'center' }}>
           <Link to="/" style={styles.navLink}>Каталог</Link>
           
+{/* Корзина видна ТОЛЬКО покупателю (role === 'user') */}
+{token && user?.role === 'user' && (
+  <Link to="/cart" style={styles.navLink}>Корзина ({cartCount})</Link>
+)}
+
           {/* Показываем панель админа только если роль admin */}
           {user?.role === 'admin' && (
             <Link to="/admin" style={styles.navLink}>Панель Админа</Link>
@@ -59,6 +69,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/cart" element={<Cart />} /> {/* <-- Маршрут для Корзины */}
         </Routes>
       </main>
     </div>
