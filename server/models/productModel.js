@@ -2,7 +2,7 @@
 const db = require('../config/db');
 
 const ProductModel = {
-    // Получить все товары
+    // Получить товары для каталога (только активные)
     getAllProducts: async () => {
         const [rows] = await db.query(`
             SELECT p.*, c.name AS category_name, s.company_name AS supplier_name
@@ -14,30 +14,44 @@ const ProductModel = {
         return rows;
     },
 
-    // Получить один товар по ID
+    // Получить ВСЕ товары (для админа, включая скрытые)
+    getAllForAdmin: async () => {
+        const [rows] = await db.query(`
+            SELECT p.*, s.company_name AS supplier_name
+            FROM products p
+            LEFT JOIN suppliers s ON p.supplier_id = s.id
+            ORDER BY p.created_at DESC
+        `);
+        return rows;
+    },
+
     getProductById: async (id) => {
         const [rows] = await db.query('SELECT * FROM products WHERE id = ?', [id]);
         return rows[0];
     },
 
-    // Создать новый товар
+    // Создать товар (is_active зависит от переданного статуса)
     createProduct: async (productData) => {
         const { 
             name, description, price, stock_quantity, 
-            min_stock = 5, // <-- Если min_stock не передан, будет 5
-            category_id, supplier_id, image_url 
+            min_stock = 5, category_id, supplier_id, image_url, is_active 
         } = productData;
         
         const [result] = await db.query(
             `INSERT INTO products 
-            (name, description, price, stock_quantity, min_stock, category_id, supplier_id, image_url) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            [name, description, price, stock_quantity, min_stock, category_id, supplier_id, image_url]
+            (name, description, price, stock_quantity, min_stock, category_id, supplier_id, image_url, is_active) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [name, description, price, stock_quantity, min_stock, category_id, supplier_id, image_url, is_active]
         );
         return result.insertId;
     },
 
-    // Обновить товар
+    // Изменить статус активности (модерация)
+    changeStatus: async (id, is_active) => {
+        const [result] = await db.query('UPDATE products SET is_active = ? WHERE id = ?', [is_active, id]);
+        return result.affectedRows;
+    },
+
     updateProduct: async (id, productData) => {
         const { name, description, price, stock_quantity } = productData;
         const [result] = await db.query(
@@ -47,9 +61,8 @@ const ProductModel = {
         return result.affectedRows;
     },
 
-    // Удалить товар (логическое удаление)
     deleteProduct: async (id) => {
-        const [result] = await db.query('UPDATE products SET is_active = 0 WHERE id = ?', [id]);
+        const [result] = await db.query('DELETE FROM products WHERE id = ?', [id]); // Полное удаление для модерации
         return result.affectedRows;
     }
 };

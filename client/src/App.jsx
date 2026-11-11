@@ -1,21 +1,19 @@
 // client/src/App.jsx
-import React, { useContext } from 'react'; // <-- Добавили useContext
+import React, { useContext } from 'react'; 
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import Catalog from './pages/Catalog';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminPanel from './pages/AdminPanel';
-import Cart from './pages/Cart'; // <-- Импорт страницы Корзины
-import { CartContext } from './context/CartContext'; // <-- Импорт контекста
+import Cart from './pages/Cart'; 
+import SupplierPanel from './pages/SupplierPanel'; // <-- Импорт панели поставщика
+import { CartContext } from './context/CartContext'; 
 import logoImg from './assets/logo.png';
 
 function App() {
   const navigate = useNavigate();
-  
-  // Получаем счетчик товаров из корзины
-  const { cartCount } = useContext(CartContext); // <-- Вот эта строка отвечает за цифру в шапке
+  const { cartCount } = useContext(CartContext); 
 
-  // Получаем данные пользователя из памяти браузера
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
   const token = localStorage.getItem('token');
@@ -23,7 +21,7 @@ function App() {
   const handleLogout = () => {
     localStorage.clear();
     navigate('/');
-    window.location.reload(); // Перезагружаем, чтобы шапка обновилась
+    window.location.reload(); 
   };
 
   return (
@@ -37,14 +35,19 @@ function App() {
         <nav style={{ display: 'flex', alignItems: 'center' }}>
           <Link to="/" style={styles.navLink}>Каталог</Link>
           
-{/* Корзина видна ТОЛЬКО покупателю (role === 'user') */}
-{token && user?.role === 'user' && (
-  <Link to="/cart" style={styles.navLink}>Корзина ({cartCount})</Link>
-)}
+          {/* Корзина видна ТОЛЬКО покупателю */}
+          {token && user?.role === 'user' && (
+            <Link to="/cart" style={styles.navLink}>Корзина ({cartCount})</Link>
+          )}
 
           {/* Показываем панель админа только если роль admin */}
           {user?.role === 'admin' && (
             <Link to="/admin" style={styles.navLink}>Панель Админа</Link>
+          )}
+
+          {/* Показываем кабинет поставщика только если роль supplier */}
+          {user?.role === 'supplier' && (
+            <Link to="/supplier" style={styles.navLink}>Кабинет поставщика</Link>
           )}
 
           {!token ? (
@@ -69,7 +72,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/admin" element={<AdminPanel />} />
-          <Route path="/cart" element={<Cart />} /> {/* <-- Маршрут для Корзины */}
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/supplier" element={<SupplierPanel />} /> {/* <-- Маршрут поставщика */}
         </Routes>
       </main>
     </div>
@@ -82,9 +86,9 @@ const styles = {
     justifyContent: 'space-between', 
     alignItems: 'center', 
     padding: '15px 40px', 
-    backgroundColor: 'rgba(255, 255, 255, 0.85)', /* Сделали шапку чуть менее прозрачной для лучшей читаемости */
+    backgroundColor: 'rgba(255, 255, 255, 0.85)', 
     backdropFilter: 'blur(15px)', 
-    borderBottom: '1px solid rgba(0, 0, 0, 0.05)', /* Строгая тонкая рамка снизу */
+    borderBottom: '1px solid rgba(0, 0, 0, 0.05)', 
     position: 'sticky', 
     top: 0, 
     zIndex: 100 
@@ -96,7 +100,7 @@ const styles = {
     letterSpacing: '1px'
   },
   navLink: { 
-    color: '#2c3e50', /* Темно-серый (графитовый) цвет вместо розового */
+    color: '#2c3e50', /* Темно-серый цвет */
     marginLeft: '25px', 
     fontSize: '16px', 
     fontWeight: '700',
@@ -104,7 +108,7 @@ const styles = {
   },
   logoutBtn: { 
     padding: '8px 15px', 
-    backgroundColor: '#ff8da1', /* Оставили розовый, чтобы кнопка выделялась */
+    backgroundColor: '#ff8da1', 
     color: 'white', 
     border: 'none', 
     borderRadius: '15px', 

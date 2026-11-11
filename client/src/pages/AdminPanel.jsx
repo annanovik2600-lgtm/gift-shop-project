@@ -1,83 +1,131 @@
 // client/src/pages/AdminPanel.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Toast from '../components/Toast';
 
 const AdminPanel = () => {
-  const [productData, setProductData] = useState({
-    name: '',
-    description: '',
-    price: '',
-    stock_quantity: '',
-    category_id: 1 // Для теста ставим 1, если у вас есть категории
-  });
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const [products, setProducts] = useState([]);
+  const [toast, setToast] = useState(null);
+  
+  // Форма создания
+  const [productData, setProductData] = useState({ name: '', description: '', price: '', stock_quantity: '' });
 
-  const handleChange = (e) => {
-    setProductData({ ...productData, [e.target.name]: e.target.value });
+  const fetchProducts = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get('http://localhost:5000/api/products/admin/all', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setProducts(res.data);
+    } catch (err) {
+      console.error(err);
+    }
   };
+
+  useEffect(() => { fetchProducts(); }, []);
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
-    setMessage('');
-    setError('');
-
     try {
-      // Получаем токен админа из localStorage
       const token = localStorage.getItem('token');
-      
-      // Отправляем запрос с заголовком Authorization
       await axios.post('http://localhost:5000/api/products', productData, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        headers: { Authorization: `Bearer ${token}` }
       });
-
-      setMessage('Товар успешно добавлен!');
-      setProductData({ name: '', description: '', price: '', stock_quantity: '', category_id: 1 }); // Очищаем форму
+      setToast({ message: 'Товар успешно добавлен!', type: 'success' });
+      setProductData({ name: '', description: '', price: '', stock_quantity: '' });
+      fetchProducts(); // Обновляем список
     } catch (err) {
-      setError(err.response?.data?.error || 'Ошибка при добавлении. Вы точно админ?');
+      setToast({ message: err.response?.data?.error || 'Ошибка', type: 'error' });
+    }
+  };
+
+  const handleModerate = async (id, is_active) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(`http://localhost:5000/api/products/${id}/status`, { is_active }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setToast({ message: is_active ? 'Товар одобрен!' : 'Товар скрыт', type: 'success' });
+      fetchProducts();
+    } catch (err) {
+      setToast({ message: 'Ошибка модерации', type: 'error' });
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Удалить товар навсегда?')) return;
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:5000/api/products/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setToast({ message: 'Товар удален', type: 'success' });
+      fetchProducts();
+    } catch (err) {
+      setToast({ message: 'Ошибка удаления', type: 'error' });
     }
   };
 
   return (
     <div style={styles.container}>
-      <div style={styles.formBox}>
-        <h2 style={styles.title}>Панель Администратора</h2>
-        <p style={{textAlign: 'center', color: '#666', marginBottom: '20px'}}>Добавление нового подарка в каталог</p>
+      <div style={styles.layout}>
         
-        {message && <p style={styles.success}>{message}</p>}
-        {error && <p style={styles.error}>{error}</p>}
+        {/* Форма добавления (Админ тоже может добавлять) */}
+        <div style={styles.formBox}>
+          <h3 style={styles.title}>Добавить товар (от админа)</h3>
+          <form onSubmit={handleAddProduct} style={styles.form}>
+            <input type="text" name="name" placeholder="Название" value={productData.name} onChange={e => setProductData({...productData, name: e.target.value})} required style={styles.input} />
+            <input type="number" step="0.01" name="price" placeholder="Цена" value={productData.price} onChange={e => setProductData({...productData, price: e.target.value})} required style={styles.input} />
+            <input type="number" name="stock_quantity" placeholder="Кол-во" value={productData.stock_quantity} onChange={e => setProductData({...productData, stock_quantity: e.target.value})} required style={styles.input} />
+            <button type="submit" style={styles.button}>Добавить сразу в каталог</button>
+          </form>
+        </div>
 
-        <form onSubmit={handleAddProduct} style={styles.form}>
-          <label>Название подарка:</label>
-          <input type="text" name="name" value={productData.name} onChange={handleChange} required style={styles.input} />
+        {/* Список товаров на модерацию */}
+        <div style={styles.listBox}>
+          <h3 style={styles.title}>Управление товарами</h3>
+          <div style={styles.productList}>
+            {products.map(p => (
+              <div key={p.id} style={{...styles.productItem, borderLeft: p.is_active ? '5px solid #2ecc71' : '5px solid #e74c3c'}}>
+                <div>
+                  <strong>{p.name}</strong>
+                  <p style={{margin: '5px 0', fontSize: '14px', color: '#666'}}>{p.price} BYN | {p.stock_quantity} шт.</p>
+                  {p.supplier_name && <small style={{color: '#8e44ad'}}>Поставщик: {p.supplier_name}</small>}
+                </div>
+                <div style={{display: 'flex', gap: '10px'}}>
+                  {!p.is_active && (
+                    <button onClick={() => handleModerate(p.id, 1)} style={styles.approveBtn}>Одобрить</button>
+                  )}
+                  {p.is_active && (
+                    <button onClick={() => handleModerate(p.id, 0)} style={styles.hideBtn}>Скрыть</button>
+                  )}
+                  <button onClick={() => handleDelete(p.id)} style={styles.deleteBtn}>Удалить</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
 
-          <label>Описание:</label>
-          <textarea name="description" value={productData.description} onChange={handleChange} style={{...styles.input, height: '80px', resize: 'none'}} />
-
-          <label>Цена (BYN):</label>
-          <input type="number" step="0.01" name="price" value={productData.price} onChange={handleChange} required style={styles.input} />
-
-          <label>Количество на складе:</label>
-          <input type="number" name="stock_quantity" value={productData.stock_quantity} onChange={handleChange} required style={styles.input} />
-
-          <button type="submit" style={styles.button}>Добавить товар</button>
-        </form>
       </div>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 };
 
 const styles = {
-  container: { display: 'flex', justifyContent: 'center', marginTop: '40px' },
-  formBox: { backgroundColor: 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(10px)', padding: '40px 50px', borderRadius: '25px', boxShadow: '0 15px 35px rgba(255, 141, 161, 0.2)', width: '500px', border: '1px solid white' },
-  title: { textAlign: 'center', fontSize: '24px', marginBottom: '10px', color: '#ff8da1', fontWeight: '800' },
+  container: { maxWidth: '1000px', margin: '40px auto', padding: '0 20px' },
+  layout: { display: 'flex', gap: '30px', flexWrap: 'wrap' },
+  formBox: { flex: '1 1 300px', backgroundColor: 'rgba(255, 255, 255, 0.9)', padding: '25px', borderRadius: '20px', height: 'fit-content' },
+  listBox: { flex: '1 1 500px', backgroundColor: 'rgba(255, 255, 255, 0.9)', padding: '25px', borderRadius: '20px' },
+  title: { marginTop: 0, color: '#2c3e50', borderBottom: '2px solid #fdf5ff', paddingBottom: '10px' },
   form: { display: 'flex', flexDirection: 'column', gap: '10px' },
-  input: { padding: '12px 15px', borderRadius: '15px', border: '1px solid var(--pink-pastel)', outline: 'none', fontSize: '15px', backgroundColor: '#fff', fontFamily: 'Nunito, sans-serif' },
-  button: { padding: '14px', backgroundColor: 'var(--pink-dark)', color: 'white', border: 'none', borderRadius: '20px', cursor: 'pointer', marginTop: '15px', fontSize: '16px', fontWeight: '700' },
-  error: { color: '#ff4d4d', fontSize: '14px', textAlign: 'center', backgroundColor: '#ffe6e6', padding: '10px', borderRadius: '10px' },
-  success: { color: '#2ecc71', fontSize: '14px', textAlign: 'center', backgroundColor: '#e8f8f5', padding: '10px', borderRadius: '10px' }
+  input: { padding: '10px', borderRadius: '10px', border: '1px solid #ddd' },
+  button: { padding: '12px', backgroundColor: 'var(--pink-dark)', color: 'white', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold' },
+  productList: { display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '15px' },
+  productItem: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px', backgroundColor: '#f9f9f9', borderRadius: '8px' },
+  approveBtn: { padding: '6px 12px', backgroundColor: '#2ecc71', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' },
+  hideBtn: { padding: '6px 12px', backgroundColor: '#f39c12', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' },
+  deleteBtn: { padding: '6px 12px', backgroundColor: '#e74c3c', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }
 };
 
 export default AdminPanel;

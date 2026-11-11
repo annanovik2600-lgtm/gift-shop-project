@@ -23,8 +23,9 @@ const AuthService = {
 
         // 4. Если это поставщик, создаем запись в таблице suppliers
         if (role === 'supplier') {
-            if (!company_name) throw new Error('Для поставщика необходимо указать название компании');
-            await UserModel.createSupplierProfile(userId, company_name);
+            // Берем название компании из поля username, если company_name не передан
+            const finalCompanyName = company_name || username;
+            await UserModel.createSupplierProfile(userId, finalCompanyName);
         }
 
         return { message: 'Пользователь успешно зарегистрирован', userId };

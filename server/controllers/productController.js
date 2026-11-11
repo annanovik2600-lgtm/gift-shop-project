@@ -11,6 +11,15 @@ const ProductController = {
         }
     },
 
+    getAllForAdmin: async (req, res) => {
+        try {
+            const products = await ProductService.getAllForAdmin();
+            res.status(200).json(products);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    },
+
     getById: async (req, res) => {
         try {
             const product = await ProductService.getById(req.params.id);
@@ -22,8 +31,18 @@ const ProductController = {
 
     create: async (req, res) => {
         try {
-            const newProductId = await ProductService.create(req.body);
-            res.status(201).json({ message: 'Товар успешно создан', id: newProductId });
+            // Передаем роль и ID пользователя из токена
+            const newProductId = await ProductService.create(req.body, req.user.role, req.user.id);
+            res.status(201).json({ message: 'Товар создан', id: newProductId });
+        } catch (error) {
+            res.status(400).json({ error: error.message });
+        }
+    },
+
+    changeStatus: async (req, res) => {
+        try {
+            const result = await ProductService.changeStatus(req.params.id, req.body.is_active);
+            res.status(200).json(result);
         } catch (error) {
             res.status(400).json({ error: error.message });
         }

@@ -4,12 +4,18 @@ const router = express.Router();
 const ProductController = require('../controllers/productController');
 const { authMiddleware, requireRole } = require('../middlewares/authMiddleware');
 
-// Публичные маршруты (доступны всем)
+// Публичные
 router.get('/', ProductController.getAll);
 router.get('/:id', ProductController.getById);
 
-// Защищенные маршруты (только для администратора)
-router.post('/', authMiddleware, requireRole('admin'), ProductController.create);
+// Только для админа (просмотр всех, включая скрытые)
+router.get('/admin/all', authMiddleware, requireRole('admin'), ProductController.getAllForAdmin);
+
+// Создавать товары могут и Админ, и Поставщик
+router.post('/', authMiddleware, requireRole('admin', 'supplier'), ProductController.create);
+
+// Модерация (смена статуса), обновление и удаление — только Админ
+router.put('/:id/status', authMiddleware, requireRole('admin'), ProductController.changeStatus);
 router.put('/:id', authMiddleware, requireRole('admin'), ProductController.update);
 router.delete('/:id', authMiddleware, requireRole('admin'), ProductController.delete);
 
