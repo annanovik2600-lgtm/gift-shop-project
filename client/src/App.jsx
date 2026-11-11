@@ -77,10 +77,41 @@ function App() {
 }
 
 const styles = {
-  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 40px', backgroundColor: 'rgba(255, 255, 255, 0.6)', backdropFilter: 'blur(15px)', borderBottom: '1px solid rgba(255, 141, 161, 0.3)', position: 'sticky', top: 0, zIndex: 100 },
-  logo: { fontSize: '22px', fontWeight: '800', background: 'linear-gradient(45deg, #ff8da1, #b19cd9)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' },
-  navLink: { color: '#b19cd9', marginLeft: '20px', fontSize: '16px', fontWeight: '700' },
-  logoutBtn: { padding: '8px 15px', backgroundColor: '#ff8da1', color: 'white', border: 'none', borderRadius: '15px', cursor: 'pointer', fontWeight: 'bold', fontFamily: 'Nunito, sans-serif' }
+  header: { 
+    display: 'flex', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    padding: '15px 40px', 
+    backgroundColor: 'rgba(255, 255, 255, 0.85)', /* Сделали шапку чуть менее прозрачной для лучшей читаемости */
+    backdropFilter: 'blur(15px)', 
+    borderBottom: '1px solid rgba(0, 0, 0, 0.05)', /* Строгая тонкая рамка снизу */
+    position: 'sticky', 
+    top: 0, 
+    zIndex: 100 
+  },
+  logo: { 
+    fontSize: '22px', 
+    fontWeight: '800', 
+    color: '#2c3e50', /* Темно-серый цвет */
+    letterSpacing: '1px'
+  },
+  navLink: { 
+    color: '#2c3e50', /* Темно-серый (графитовый) цвет вместо розового */
+    marginLeft: '25px', 
+    fontSize: '16px', 
+    fontWeight: '700',
+    transition: 'color 0.3s ease'
+  },
+  logoutBtn: { 
+    padding: '8px 15px', 
+    backgroundColor: '#ff8da1', /* Оставили розовый, чтобы кнопка выделялась */
+    color: 'white', 
+    border: 'none', 
+    borderRadius: '15px', 
+    cursor: 'pointer', 
+    fontWeight: 'bold', 
+    fontFamily: 'Nunito, sans-serif' 
+  }
 };
 
 export default App;

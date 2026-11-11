@@ -41,7 +41,13 @@ const ProductCard = ({ product }) => {
         <div style={styles.footer}>
           <span style={styles.price}>{product.price} BYN</span>
           {/* Вызываем нашу новую функцию */}
-          <button onClick={handleAddToCart} style={styles.button}>В корзину</button>
+         <button 
+  onClick={handleAddToCart} 
+  style={styles.button} 
+  className="btn-hover-effect" // <--- ДОБАВЛЯЕМ ЭТУ СТРОКУ
+>
+  В корзину
+</button>
         </div>
       </div>
     </div>
@@ -96,10 +102,10 @@ const styles = {
   price: {
     fontSize: '20px',
     fontWeight: '800',
-    color: 'var(--pink-dark)',
+    color: '#2c3e50',
   },
   button: {
-    backgroundColor: 'var(--pink-pastel)',
+    backgroundColor: 'var(--pink-dark)', // Более насыщенный розовый
     color: '#fff',
     border: 'none',
     padding: '10px 18px',
@@ -107,6 +113,7 @@ const styles = {
     cursor: 'pointer',
     fontWeight: '700',
     transition: 'background-color 0.3s ease',
+    boxShadow: '0 4px 10px rgba(255, 141, 161, 0.3)' // Добавили легкую тень кнопке
   }
 };
 

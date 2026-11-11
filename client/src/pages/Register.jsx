@@ -68,7 +68,7 @@ const Register = () => {
 const styles = {
   container: { display: 'flex', justifyContent: 'center', marginTop: '40px', marginBottom: '40px' },
   formBox: { backgroundColor: 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(10px)', padding: '40px 50px', borderRadius: '25px', boxShadow: '0 15px 35px rgba(255, 141, 161, 0.2)', width: '420px', border: '1px solid white' },
-  title: { textAlign: 'center', fontSize: '26px', marginBottom: '25px', color: '#ff8da1', fontWeight: '800' },
+  title: { textAlign: 'center', fontSize: '26px', marginBottom: '25px', color: '#2c3e50', fontWeight: '800' },
   form: { display: 'flex', flexDirection: 'column', gap: '10px' },
   input: { padding: '12px 15px', borderRadius: '15px', border: '1px solid var(--pink-pastel)', outline: 'none', fontSize: '15px', backgroundColor: '#fff', fontFamily: 'Nunito, sans-serif' },
   button: { padding: '14px', backgroundColor: 'var(--pink-dark)', color: 'white', border: 'none', borderRadius: '20px', cursor: 'pointer', marginTop: '15px', fontSize: '16px', fontWeight: '700' },

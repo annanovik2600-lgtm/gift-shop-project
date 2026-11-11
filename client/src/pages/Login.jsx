@@ -92,7 +92,7 @@ const styles = {
     textAlign: 'center',
     fontSize: '28px', /* Увеличили заголовок */
     marginBottom: '30px',
-    color: '#ff8da1', /* Пикми-цвет для заголовка */
+    color: '#2c3e50', 
     fontWeight: '800'
   },
   form: { 

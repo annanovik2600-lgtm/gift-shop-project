@@ -1,5 +1,5 @@
 /* client/src/index.css */
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800&family=Nunito:wght@400;600;700&display=swap');
 
 :root {
   /* Пикми-палитра */
@@ -52,4 +52,26 @@ body::before {
 a {
   text-decoration: none;
   color: inherit;
+}
+
+h1, h2, h3 {
+  font-family: 'Montserrat', sans-serif; /* Строгий шрифт для заголовков */
+  color: #2c3e50; /* Темно-серый, почти черный цвет */
+  margin-top: 0;
+}
+
+/* Эффект наведения для ссылок в шапке сайта */
+nav a:hover {
+  color: #ff8da1 !important; /* При наведении ссылки становятся нежно-розовыми */
+  transition: color 0.2s ease-in-out;
+}
+
+/* Красивое увеличение кнопки при наведении */
+.btn-hover-effect {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out !important;
+}
+
+.btn-hover-effect:hover {
+  transform: scale(1.05); /* Увеличиваем кнопку на 5% */
+  box-shadow: 0 6px 15px rgba(255, 141, 161, 0.4) !important; /* Добавляем тень для объема */
 }

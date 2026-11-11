@@ -54,8 +54,14 @@ const styles = {
   },
   header: {
     textAlign: 'center',
-    marginBottom: '30px',
-    color: '#2c3e50'
+    marginBottom: '40px',
+    fontSize: '36px', // Увеличили размер
+    fontWeight: '800', // Сделали жирным
+    color: '#2c3e50', // Строгий темно-серый цвет (вместо розового)
+    letterSpacing: '1px',
+    textTransform: 'uppercase', // Сделали все буквы заглавными (для солидности)
+    // Можно добавить легкую тень для объема
+    textShadow: '0px 2px 4px rgba(0,0,0,0.05)'
   },
   grid: {
     display: 'grid',
