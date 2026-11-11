@@ -1,11 +1,13 @@
 // client/src/components/ProductCard.jsx
-import React, { useContext } from 'react';
+import React, { useContext, useState} from 'react';
 import { useNavigate } from 'react-router-dom'; // Импортируем навигацию
 import { CartContext } from '../context/CartContext';
+import Toast from './Toast';
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useContext(CartContext);
   const navigate = useNavigate(); // Хук для переадресации
+  const [toast, setToast] = useState(null); // { message: '...', type: 'error' }
 
   // Новая функция с проверками
   const handleAddToCart = () => {
@@ -13,21 +15,19 @@ const ProductCard = ({ product }) => {
     const userString = localStorage.getItem('user');
     const user = userString ? JSON.parse(userString) : null;
 
-    // 1. Если не авторизован
     if (!token) {
-      alert('Для покупки необходимо войти в систему или зарегистрироваться!');
-      navigate('/login');
+      setToast({ message: 'Для покупки необходимо войти в систему', type: 'error' });
+      setTimeout(() => navigate('/login'), 2000); // Перекинем на вход через 2 сек
       return;
     }
 
-    // 2. Если это админ или поставщик
     if (user?.role !== 'user') {
-      alert('Только покупатели могут добавлять товары в корзину!');
+      setToast({ message: 'Только покупатели могут добавлять товары', type: 'error' });
       return;
     }
 
-    // 3. Если всё хорошо — добавляем
     addToCart(product);
+    setToast({ message: 'Товар добавлен в корзину!', type: 'success' });
   };
 
   return (
@@ -41,15 +41,19 @@ const ProductCard = ({ product }) => {
         <div style={styles.footer}>
           <span style={styles.price}>{product.price} BYN</span>
           {/* Вызываем нашу новую функцию */}
-         <button 
-  onClick={handleAddToCart} 
-  style={styles.button} 
-  className="btn-hover-effect" // <--- ДОБАВЛЯЕМ ЭТУ СТРОКУ
->
-  В корзину
-</button>
+          <button 
+            onClick={handleAddToCart} 
+            style={styles.button} 
+            className="btn-hover-effect"
+          >
+            В корзину
+          </button>
         </div>
       </div>
+      
+      {/* ВОТ ЗДЕСЬ ДОБАВЛЯЕМ УВЕДОМЛЕНИЕ */}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      
     </div>
   );
 };

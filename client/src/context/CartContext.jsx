@@ -27,7 +27,6 @@ export const CartProvider = ({ children }) => {
       // Если товара нет, добавляем его с количеством 1
       return [...prevCart, { ...product, quantity: 1 }];
     });
-    alert('Товар добавлен в корзину!');
   };
 
   const removeFromCart = (productId) => {

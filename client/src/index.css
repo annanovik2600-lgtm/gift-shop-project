@@ -75,3 +75,8 @@ nav a:hover {
   transform: scale(1.05); /* Увеличиваем кнопку на 5% */
   box-shadow: 0 6px 15px rgba(255, 141, 161, 0.4) !important; /* Добавляем тень для объема */
 }
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}

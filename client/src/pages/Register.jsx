@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+import Toast from '../components/Toast';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ const Register = () => {
     role: 'user' // По умолчанию покупатель
   });
   const [error, setError] = useState('');
+  const [toast, setToast] = useState(null);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -23,8 +25,8 @@ const Register = () => {
 
     try {
       await axios.post('http://localhost:5000/api/auth/register', formData);
-      alert('Регистрация успешна! Теперь вы можете войти.');
-      navigate('/login'); // Перекидываем на страницу входа
+      setToast({ message: 'Регистрация успешна! Теперь войдите.', type: 'success' });
+      setTimeout(() => navigate('/login'), 2000);
     } catch (err) {
       setError(err.response?.data?.error || 'Ошибка при регистрации');
     }
@@ -60,6 +62,7 @@ const Register = () => {
           Уже есть аккаунт? <Link to="/login" style={{color: 'var(--pink-dark)'}}>Войти</Link>
         </p>
       </div>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 };

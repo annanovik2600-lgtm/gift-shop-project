@@ -55,7 +55,7 @@ function App() {
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', marginLeft: '20px' }}>
               <span style={{ color: '#ff8da1', fontWeight: 'bold', marginRight: '15px' }}>
-                Привет, {user?.username}!
+                 {user?.username}
               </span>
               <button onClick={handleLogout} style={styles.logoutBtn}>Выйти</button>
             </div>

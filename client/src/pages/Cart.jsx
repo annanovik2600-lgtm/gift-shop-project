@@ -3,11 +3,13 @@ import React, { useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
+import Toast from '../components/Toast';
 
 const Cart = () => {
   const { cart, removeFromCart, cartTotal, clearCart } = useContext(CartContext);
   const [address, setAddress] = useState('');
   const [error, setError] = useState('');
+  const [toast, setToast] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,25 +21,24 @@ const Cart = () => {
   if (!token) {
     navigate('/login');
   } 
-  // Если роль не user (например, зашел админ) — отправляем в каталог
   else if (user?.role !== 'user') {
-    alert('Корзина доступна только покупателям.');
-    navigate('/');
+    setToast({ message: 'Корзина доступна только покупателям.', type: 'error' });
+    setTimeout(() => navigate('/'), 2000); // Даем 2 секунды, чтобы прочитать сообщение
   }
 }, [navigate]);
 
   const handleCheckout = async () => {
     if (cart.length === 0) return;
     if (!address) {
-      setError('Введите адрес доставки');
+      setToast({ message: 'Введите адрес доставки', type: 'error' });
       return;
     }
 
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        alert('Для оформления заказа нужно войти!');
-        navigate('/login');
+        setToast({ message: 'Войдите в систему для оформления заказа', type: 'error' }); 
+        setTimeout(() => navigate('/login'), 2000);
         return;
       }
 
@@ -55,12 +56,12 @@ const Cart = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      alert('Заказ успешно оформлен!');
+      setToast({ message: 'Заказ успешно оформлен!', type: 'success' });
       clearCart(); // Очищаем корзину
       navigate('/'); // Идем на главную
 
     } catch (err) {
-      setError(err.response?.data?.error || 'Ошибка при оформлении заказа');
+      setToast({ message: err.response?.data?.error || 'Ошибка при оформлении заказа', type: 'error' });
     }
   };
 
@@ -102,6 +103,7 @@ const Cart = () => {
           <button onClick={handleCheckout} style={styles.button}>Оформить заказ</button>
         </div>
       </div>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 };

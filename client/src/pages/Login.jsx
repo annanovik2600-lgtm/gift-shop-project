@@ -2,11 +2,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+import Toast from '../components/Toast';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [toast, setToast] = useState(null);
   const navigate = useNavigate(); // Хук для переадресации
 
   const handleLogin = async (e) => {
@@ -24,10 +26,9 @@ const Login = () => {
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
 
-      alert('Вы успешно вошли!');
+      setToast({ message: 'Вы успешно вошли!', type: 'success' });
+      setTimeout(() => { navigate('/'); window.location.reload(); }, 1000); 
       
-      // Перенаправляем на главную страницу (в каталог)
-      navigate('/');
       // Перезагружаем страницу, чтобы шапка обновилась (пока сделаем так)
       window.location.reload(); 
       
@@ -69,6 +70,7 @@ const Login = () => {
           Нет аккаунта? <Link to="/register" style={{color: '#3498db'}}>Зарегистрироваться</Link>
         </p>
       </div>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 };
