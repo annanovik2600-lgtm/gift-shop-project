@@ -1,122 +1,75 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+// client/src/App.jsx
+import React from 'react';
+import { Routes, Route, Link } from 'react-router-dom';
+import logoImg from './assets/logo.png';
+import Catalog from './pages/Catalog';
+import Login from './pages/Login'; // <-- ДОБАВИЛИ ИМПОРТ
 
 function App() {
-  const [count, setCount] = useState(0)
+  // Проверяем, есть ли токен в браузере (вошел ли пользователь)
+  const token = localStorage.getItem('token');
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div>
+      <header style={styles.header}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+    <img src={logoImg} alt="Логотип" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'contain' }} />
+    <div style={styles.logo}>Магазин Подарков</div>
+</div>
+        <nav>
+          <Link to="/" style={styles.navLink}>Каталог</Link>
+          
+          {/* Если токена нет, показываем кнопку Войти */}
+          {!token ? (
+            <Link to="/login" style={styles.navLink}>Войти</Link>
+          ) : (
+            <a href="/" onClick={() => { localStorage.clear(); window.location.reload(); }} style={styles.navLink}>Выйти</a>
+          )}
+        </nav>
+      </header>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      <main>
+        <Routes>
+          <Route path="/" element={<Catalog />} />
+          <Route path="/login" element={<Login />} /> {/* <-- ДОБАВИЛИ МАРШРУТ */}
+        </Routes>
+      </main>
+    </div>
+  );
 }
 
-export default App
+const styles = {
+    header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '15px 40px',
+    
+    /* Делаем шапку полупрозрачной */
+    backgroundColor: 'rgba(255, 255, 255, 0.6)', 
+    backdropFilter: 'blur(15px)', /* Усиливаем размытие */
+    
+    borderBottom: '1px solid rgba(255, 141, 161, 0.3)',
+    position: 'sticky',
+    top: 0,
+    zIndex: 100,
+  },
+  logo: {
+    fontSize: '24px',
+    fontWeight: '800',
+    /* Градиентный текст для логотипа */
+    background: 'linear-gradient(45deg, #ff8da1, #b19cd9)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    letterSpacing: '1px',
+  },
+  navLink: {
+    color: '#b19cd9', // Лавандовый цвет для ссылок
+    marginLeft: '25px',
+    fontSize: '16px',
+    fontWeight: '700',
+    transition: 'color 0.3s ease',
+  }
+};
+
+export default App;

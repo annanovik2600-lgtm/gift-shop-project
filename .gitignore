@@ -1,0 +1,18 @@
+# Зависимости (они восстанавливаются через npm install)
+node_modules/
+
+# Секреты (пароли от БД)
+.env
+.env.local
+
+# Сборка React (создается при билде)
+client/dist/
+server/build/
+
+# Системный мусор
+.DS_Store
+Thumbs.db
+
+# Логи
+*.log
+npm-debug.log*
