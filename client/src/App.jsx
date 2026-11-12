@@ -9,6 +9,7 @@ import Cart from './pages/Cart';
 import SupplierPanel from './pages/SupplierPanel'; // <-- Импорт панели поставщика
 import { CartContext } from './context/CartContext'; 
 import logoImg from './assets/logo.png';
+import MyOrders from './pages/MyOrders';
 
 function App() {
   const navigate = useNavigate();
@@ -39,6 +40,11 @@ function App() {
           {token && user?.role === 'user' && (
             <Link to="/cart" style={styles.navLink}>Корзина ({cartCount})</Link>
           )}
+
+          {/* Личный кабинет только для покупателя */}
+{token && user?.role === 'user' && (
+  <Link to="/my-orders" style={styles.navLink}>Мои заказы</Link>
+)}
 
           {/* Показываем панель админа только если роль admin */}
           {user?.role === 'admin' && (
@@ -74,6 +80,7 @@ function App() {
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/supplier" element={<SupplierPanel />} /> {/* <-- Маршрут поставщика */}
+          <Route path="/my-orders" element={<MyOrders />} />
         </Routes>
       </main>
     </div>

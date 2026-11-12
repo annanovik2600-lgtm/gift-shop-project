@@ -3,32 +3,33 @@ const db = require('../config/db');
 
 const OrderModel = {
     // Создание заказа с использованием транзакции
-    createOrder: async (userId, items, totalAmount, deliveryAddress, paymentMethod) => {
-        const connection = await db.getConnection(); // Берем одно соединение для транзакции
+    createOrder: async (userId, items, deliveryAddress, paymentMethod) => {
+        const connection = await db.getConnection();
         
         try {
-            await connection.beginTransaction(); // НАЧАЛО ТРАНЗАКЦИИ
+            await connection.beginTransaction();
 
-            // 1. Создаем сам заказ
+            // 1. Сначала создаем "пустой" заказ (сумму поставим 0, обновим позже)
             const [orderResult] = await connection.query(
                 `INSERT INTO orders (user_id, total_amount, delivery_address, payment_method, status) 
-                 VALUES (?, ?, ?, ?, 'new')`,
-                [userId, totalAmount, deliveryAddress, paymentMethod]
+                 VALUES (?, 0, ?, ?, 'new')`,
+                [userId, deliveryAddress, paymentMethod]
             );
             const orderId = orderResult.insertId;
 
-            // 2. Проходимся по каждому товару в корзине
+            let calculatedTotal = 0; // <-- НОВАЯ ПЕРЕМЕННАЯ ДЛЯ СУММЫ
+
+            // 2. Проходимся по каждому товару
             for (const item of items) {
-                // Проверяем, хватает ли товара на складе
                 const [productRows] = await connection.query(
                     'SELECT stock_quantity, price FROM products WHERE id = ? FOR UPDATE', 
                     [item.product_id]
                 );
                 
                 const product = productRows[0];
-                if (!product) throw new Error(`Товар с ID ${item.product_id} не найден`);
+                if (!product) throw new Error(`Товар не найден`);
                 if (product.stock_quantity < item.quantity) {
-                    throw new Error(`Товара "${item.product_id}" не хватает на складе (осталось: ${product.stock_quantity})`);
+                    throw new Error(`Товара не хватает на складе (осталось: ${product.stock_quantity})`);
                 }
 
                 // Добавляем позицию в заказ
@@ -38,21 +39,30 @@ const OrderModel = {
                     [orderId, item.product_id, item.quantity, product.price]
                 );
 
-                // Вычитаем количество со склада
+                // Считаем сумму: цена * количество
+                calculatedTotal += parseFloat(product.price) * item.quantity;
+
+                // Вычитаем со склада
                 await connection.query(
                     'UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ?',
                     [item.quantity, item.product_id]
                 );
             }
 
-            await connection.commit(); // Если всё ок — СОХРАНЯЕМ (COMMIT)
+            // 3. Обновляем итоговую сумму в заказе
+            await connection.query(
+                'UPDATE orders SET total_amount = ? WHERE id = ?',
+                [calculatedTotal, orderId]
+            );
+
+            await connection.commit(); 
             return orderId;
 
         } catch (error) {
-            await connection.rollback(); // Если ошибка — ОТМЕНЯЕМ ВСЁ (ROLLBACK)
+            await connection.rollback(); 
             throw error;
         } finally {
-            connection.release(); // Возвращаем соединение в пул
+            connection.release(); 
         }
     },
 

@@ -9,14 +9,10 @@ const OrderService = {
             throw new Error('Корзина пуста');
         }
 
-        // Считаем общую сумму (в реальном проекте цену лучше брать из БД, но для курсовой сойдет)
-        // В нашем случае модель сама подтянет актуальную цену из БД
-        let totalAmount = 0; 
-        
+        // Теперь модель сама посчитает сумму
         const orderId = await OrderModel.createOrder(
             userId, 
             items, 
-            totalAmount, // Сумму можно пересчитать внутри модели, но пока оставим 0, потом обновим
             deliveryAddress, 
             paymentMethod
         );
