@@ -31,15 +31,13 @@ const ProductController = {
 
     create: async (req, res) => {
         try {
-            // Копируем данные из req.body
             const productData = { ...req.body };
             
-            // Если файл загружен, записываем путь к нему
+            // ВОТ ЭТА СТРОКА ОТВЕЧАЕТ ЗА СОХРАНЕНИЕ ПУТИ
             if (req.file) {
                 productData.image_url = `/uploads/${req.file.filename}`;
             }
 
-            // Передаем в сервис
             const newProductId = await ProductService.create(productData, req.user.role, req.user.id);
             res.status(201).json({ message: 'Товар создан', id: newProductId });
         } catch (error) {

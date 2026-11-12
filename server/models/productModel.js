@@ -34,14 +34,15 @@ const ProductModel = {
     createProduct: async (productData) => {
         const { 
             name, description, price, stock_quantity, 
-            min_stock = 5, category_id, supplier_id, image_url, is_active 
+            min_stock = 5, category_id, supplier_id, image_url, is_active,
+            recipient_type, occasion 
         } = productData;
         
         const [result] = await db.query(
             `INSERT INTO products 
-            (name, description, price, stock_quantity, min_stock, category_id, supplier_id, image_url, is_active) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [name, description, price, stock_quantity, min_stock, category_id, supplier_id, image_url, is_active]
+            (name, description, price, stock_quantity, min_stock, category_id, supplier_id, image_url, is_active, recipient_type, occasion) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [name, description, price, stock_quantity, min_stock, category_id, supplier_id, image_url, is_active, recipient_type, occasion]
         );
         return result.insertId;
     },
@@ -53,10 +54,10 @@ const ProductModel = {
     },
 
     updateProduct: async (id, productData) => {
-        const { name, description, price, stock_quantity } = productData;
+        const { name, description, price, stock_quantity, recipient_type, occasion, is_active } = productData;
         const [result] = await db.query(
-            'UPDATE products SET name = ?, description = ?, price = ?, stock_quantity = ? WHERE id = ?',
-            [name, description, price, stock_quantity, id]
+            'UPDATE products SET name = ?, description = ?, price = ?, stock_quantity = ?, recipient_type = ?, occasion = ?, is_active = ? WHERE id = ?',
+            [name, description, price, stock_quantity, recipient_type, occasion, is_active, id]
         );
         return result.affectedRows;
     },

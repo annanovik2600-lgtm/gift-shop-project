@@ -54,13 +54,19 @@ const SupplierPanel = () => {
           <label>Описание:</label>
           <textarea name="description" value={productData.description} onChange={handleChange} style={{...styles.input, height: '80px', resize: 'none'}} />
 
-         <label>Фотография товара:</label>
-          <input 
-            type="file" 
-            accept="image/*" // Разрешаем выбирать только картинки
-            onChange={(e) => setImage(e.target.files[0])} 
-            style={styles.input} 
-          />
+          <label>Фотография товара:</label>
+          <div style={styles.fileUploadContainer}>
+            <input 
+              type="file" 
+              accept="image/*" 
+              onChange={(e) => setImage(e.target.files[0])} 
+              style={styles.fileInput} 
+              id="file-upload"
+            />
+            <label htmlFor="file-upload" style={styles.fileLabel}>
+              {image ? image.name : ' Выбрать фотографию'}
+            </label>
+          </div>
 
           <label>Цена (BYN):</label>
           <input type="number" step="0.01" name="price" value={productData.price} onChange={handleChange} required style={styles.input} />
@@ -82,7 +88,26 @@ const styles = {
   title: { textAlign: 'center', fontSize: '24px', marginBottom: '10px', color: '#2c3e50', fontWeight: '800' },
   form: { display: 'flex', flexDirection: 'column', gap: '10px' },
   input: { padding: '12px 15px', borderRadius: '15px', border: '1px solid var(--pink-pastel)', outline: 'none', fontSize: '15px', backgroundColor: '#fff', fontFamily: 'Nunito, sans-serif' },
-  button: { padding: '14px', backgroundColor: 'var(--pink-dark)', color: 'white', border: 'none', borderRadius: '20px', cursor: 'pointer', marginTop: '15px', fontSize: '16px', fontWeight: '700' }
+  button: { padding: '14px', backgroundColor: 'var(--pink-dark)', color: 'white', border: 'none', borderRadius: '20px', cursor: 'pointer', marginTop: '15px', fontSize: '16px', fontWeight: '700' },
+    fileUploadContainer: {
+    position: 'relative',
+    marginBottom: '15px'
+  },
+  fileInput: {
+    display: 'none' // Прячем стандартный уродливый инпут
+  },
+  fileLabel: {
+    display: 'block',
+    padding: '12px 15px',
+    backgroundColor: '#fff',
+    border: '2px dashed var(--pink-pastel)', // Красивая пунктирная рамка
+    borderRadius: '15px',
+    textAlign: 'center',
+    cursor: 'pointer',
+    color: '#666',
+    fontWeight: '600',
+    transition: 'all 0.3s ease'
+  }
 };
 
 export default SupplierPanel;

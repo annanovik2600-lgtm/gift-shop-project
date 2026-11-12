@@ -21,9 +21,11 @@ const authMiddleware = (req, res, next) => {
 };
 
 // Middleware для проверки конкретной роли (например, только для админа)
-const requireRole = (role) => {
+// Middleware для проверки конкретной роли (или нескольких)
+const requireRole = (...roles) => {
     return (req, res, next) => {
-        if (req.user.role !== role) {
+        // Проверяем, есть ли роль пользователя в списке разрешенных
+        if (!roles.includes(req.user.role)) {
             return res.status(403).json({ error: 'Доступ запрещен. Недостаточно прав.' });
         }
         next();
