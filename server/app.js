@@ -1,6 +1,7 @@
 // server/app.js
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
@@ -11,7 +12,7 @@ const app = express();
 // Middleware
 app.use(cors()); // Разрешаем запросы с React (другой порт)
 app.use(express.json()); // Парсим JSON из тела запроса
-
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Использование маршрутов
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);

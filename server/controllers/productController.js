@@ -31,8 +31,16 @@ const ProductController = {
 
     create: async (req, res) => {
         try {
-            // Передаем роль и ID пользователя из токена
-            const newProductId = await ProductService.create(req.body, req.user.role, req.user.id);
+            // Копируем данные из req.body
+            const productData = { ...req.body };
+            
+            // Если файл загружен, записываем путь к нему
+            if (req.file) {
+                productData.image_url = `/uploads/${req.file.filename}`;
+            }
+
+            // Передаем в сервис
+            const newProductId = await ProductService.create(productData, req.user.role, req.user.id);
             res.status(201).json({ message: 'Товар создан', id: newProductId });
         } catch (error) {
             res.status(400).json({ error: error.message });

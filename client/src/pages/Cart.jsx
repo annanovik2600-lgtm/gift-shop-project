@@ -126,7 +126,7 @@ const Cart = () => {
           </div>
 
           <p style={{ fontSize: '13px', color: '#888', marginBottom: '20px', marginTop: '5px' }}>
-            📧 После оформления на вашу электронную почту будут приходить уведомления о статусе заказа.
+            После оформления на вашу электронную почту будут приходить уведомления о статусе заказа.
           </p>
           
           <button onClick={handleCheckout} style={styles.button} className="btn-hover-effect">

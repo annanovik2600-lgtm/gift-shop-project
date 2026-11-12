@@ -33,7 +33,15 @@ const ProductCard = ({ product }) => {
   return (
     <div style={styles.card}>
       <div style={styles.imagePlaceholder}>
-        🎁
+        {product.image_url ? (
+          <img 
+            src={`http://localhost:5000${product.image_url}`} 
+            alt={product.name} 
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+          />
+        ) : (
+          <span>🎁</span> // Показываем эмодзи, если картинки нет
+        )}
       </div>
       <div style={styles.content}>
         <h3 style={styles.title}>{product.name}</h3>

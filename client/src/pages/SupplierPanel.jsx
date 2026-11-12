@@ -8,6 +8,7 @@ const SupplierPanel = () => {
     name: '', description: '', price: '', stock_quantity: ''
   });
   const [toast, setToast] = useState(null);
+  const [image, setImage] = useState(null);
 
   const handleChange = (e) => setProductData({ ...productData, [e.target.name]: e.target.value });
 
@@ -15,12 +16,26 @@ const SupplierPanel = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/api/products', productData, {
-        headers: { Authorization: `Bearer ${token}` }
+      
+      // Создаем FormData (он нужен для передачи файлов)
+      const formData = new FormData();
+      formData.append('name', productData.name);
+      formData.append('description', productData.description);
+      formData.append('price', productData.price);
+      formData.append('stock_quantity', productData.stock_quantity);
+      
+      // Добавляем файл, если он выбран
+      if (image) {
+        formData.append('image', image);
+      }
+
+      await axios.post('http://localhost:5000/api/products', formData, {
+        headers: { Authorization: `Bearer ${token}` } // Content-Type axios ставит сам!
       });
 
-      setToast({ message: 'Товар отправлен на модерацию администратору!', type: 'success' });
+      setToast({ message: 'Товар с картинкой отправлен на модерацию!', type: 'success' });
       setProductData({ name: '', description: '', price: '', stock_quantity: '' });
+      setImage(null); // Очищаем файл
     } catch (err) {
       setToast({ message: err.response?.data?.error || 'Ошибка', type: 'error' });
     }
@@ -38,6 +53,14 @@ const SupplierPanel = () => {
 
           <label>Описание:</label>
           <textarea name="description" value={productData.description} onChange={handleChange} style={{...styles.input, height: '80px', resize: 'none'}} />
+
+         <label>Фотография товара:</label>
+          <input 
+            type="file" 
+            accept="image/*" // Разрешаем выбирать только картинки
+            onChange={(e) => setImage(e.target.files[0])} 
+            style={styles.input} 
+          />
 
           <label>Цена (BYN):</label>
           <input type="number" step="0.01" name="price" value={productData.price} onChange={handleChange} required style={styles.input} />
