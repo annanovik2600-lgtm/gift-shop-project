@@ -32,15 +32,21 @@ const ProductCard = ({ product }) => {
 
   return (
     <div style={styles.card}>
-      <div style={styles.imagePlaceholder}>
+     <div style={styles.imagePlaceholder}>
         {product.image_url ? (
           <img 
             src={`http://localhost:5000${product.image_url}`} 
             alt={product.name} 
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            style={{ 
+              width: '100%', 
+              height: '100%', 
+              objectFit: 'contain', // <--- ВОТ ГЛАВНОЕ ИЗМЕНЕНИЕ (вписывает целиком)
+              backgroundColor: '#fff', // Белый фон для пустых мест
+              padding: '0px' // Небольшой отступ от краев
+            }} 
           />
         ) : (
-          <span>🎁</span> // Показываем эмодзи, если картинки нет
+          <span>🎁</span>
         )}
       </div>
       <div style={styles.content}>

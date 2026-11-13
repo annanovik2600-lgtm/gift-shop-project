@@ -7,6 +7,7 @@ const AdminPanel = () => {
   const [products, setProducts] = useState([]);
   const [toast, setToast] = useState(null);
   const [editingProduct, setEditingProduct] = useState(null);
+    const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
   // Списки для выпадающих меню
   const recipients = ['Для всех', 'Для детей', 'Для женщин', 'Для мужчин'];
@@ -60,13 +61,13 @@ const AdminPanel = () => {
 
   // Удалить товар
   const handleDelete = async (id) => {
-    if (!window.confirm('Удалить товар навсегда?')) return;
     try {
       const token = localStorage.getItem('token');
       await axios.delete(`http://localhost:5000/api/products/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setToast({ message: 'Товар удален', type: 'success' });
+      setDeleteConfirmId(null); // Закрываем окно
       fetchProducts();
     } catch (err) {
       setToast({ message: 'Ошибка удаления', type: 'error' });
@@ -92,7 +93,7 @@ const AdminPanel = () => {
                 <button onClick={() => handleEditClick(p)} style={styles.editBtn}>
                   {p.is_active ? 'Редактировать' : 'Одобрить'}
                 </button>
-                <button onClick={() => handleDelete(p.id)} style={styles.deleteBtn}>Удалить</button>
+               <button onClick={() => setDeleteConfirmId(p.id)} style={styles.deleteBtn}>Удалить</button>
               </div>
             </div>
           ))}
@@ -138,6 +139,29 @@ const AdminPanel = () => {
           </div>
         )}
       </div>
+            {/* Кастомное окно подтверждения удаления */}
+      {deleteConfirmId && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.modalContent}>
+            <h3 style={{marginTop: 0, color: '#e74c3c'}}>Удалить товар?</h3>
+            <p style={{color: '#666'}}>Это действие нельзя будет отменить.</p>
+            <div style={{display: 'flex', gap: '10px', marginTop: '20px'}}>
+              <button 
+                onClick={() => handleDelete(deleteConfirmId)} 
+                style={{...styles.button, backgroundColor: '#e74c3c', color: 'white'}}
+              >
+                Да, удалить
+              </button>
+              <button 
+                onClick={() => setDeleteConfirmId(null)} 
+                style={{...styles.button, backgroundColor: '#bdc3c7', color: '#333'}}
+              >
+                Отмена
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
@@ -156,6 +180,14 @@ const styles = {
   editBtn: { padding: '8px 15px', backgroundColor: '#3498db', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' },
   deleteBtn: { padding: '8px 15px', backgroundColor: '#e74c3c', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' },
   button: { flex: 1, padding: '12px', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '15px' },
+    modalOverlay: {
+    position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+    backgroundColor: 'rgba(0,0,0,0.4)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 2000
+  },
+  modalContent: {
+    backgroundColor: '#fff', padding: '30px', borderRadius: '20px', width: '350px', textAlign: 'center',
+    boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
+  },
   badge: { display: 'inline-block', padding: '4px 8px', backgroundColor: '#e8f8f5', color: '#27ae60', borderRadius: '5px', fontSize: '12px', marginRight: '5px', marginTop: '5px', fontWeight: 'bold' }
 };
 
