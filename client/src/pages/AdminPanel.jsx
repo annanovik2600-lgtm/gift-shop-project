@@ -85,7 +85,16 @@ const AdminPanel = () => {
             <div key={p.id} style={{...styles.productItem, borderLeft: p.is_active ? '5px solid #2ecc71' : '5px solid #e74c3c'}}>
               <div>
                 <strong>{p.name}</strong> <span style={{color: '#888', fontSize: '12px'}}>({p.is_active ? 'В каталоге' : 'На модерации'})</span>
-                <p style={{margin: '5px 0', fontSize: '14px'}}>{p.price} BYN | {p.stock_quantity} шт.</p>
+                <p style={{margin: '5px 0', fontSize: '14px'}}>
+  {p.price} BYN | 
+  <span style={{ 
+    color: p.stock_quantity > 5 ? '#27ae60' : '#e74c3c', // Зеленый, если > 5, красный если мало
+    fontWeight: 'bold',
+    marginLeft: '5px'
+  }}>
+    Остаток: {p.stock_quantity} шт.
+  </span>
+</p>
                 {p.recipient_type && <span style={styles.badge}>{p.recipient_type}</span>}
                 {p.occasion && <span style={{...styles.badge, backgroundColor: '#fdf5ff', color: '#8e44ad'}}>{p.occasion}</span>}
               </div>

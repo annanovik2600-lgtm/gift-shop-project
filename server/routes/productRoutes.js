@@ -6,6 +6,7 @@ const { authMiddleware, requireRole } = require('../middlewares/authMiddleware')
 const upload = require('../middlewares/uploadMiddleware');
 // Публичные
 router.get('/', ProductController.getAll);
+router.get('/my', authMiddleware, requireRole('supplier'), ProductController.getMyProducts);
 router.get('/:id', ProductController.getById);
 
 // Только для админа (просмотр всех, включая скрытые)

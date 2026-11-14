@@ -44,6 +44,14 @@ const ProductService = {
         return { message: 'Товар обновлен' };
     },
 
+        getSupplierProducts: async (userId) => {
+        // Сначала находим ID поставщика по ID пользователя
+        const [suppliers] = await db.query('SELECT id FROM suppliers WHERE user_id = ?', [userId]);
+        if (suppliers.length === 0) throw new Error('Профиль поставщика не найден');
+        
+        return await ProductModel.getBySupplierId(suppliers[0].id);
+    },
+
     delete: async (id) => {
         const affected = await ProductModel.deleteProduct(id);
         if (affected === 0) throw new Error('Товар не найден');

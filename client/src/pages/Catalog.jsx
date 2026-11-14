@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ProductCard from '../components/ProductCard';
+import Recommendations from '../components/Recommendations';
 
 const Catalog = () => {
   const [products, setProducts] = useState([]);
@@ -63,9 +64,11 @@ const Catalog = () => {
         </div>
       </div>
       
+      <Recommendations />
       {filteredProducts.length === 0 ? (
         <p style={{ textAlign: 'center', fontSize: '18px', marginTop: '40px' }}>По вашему запросу ничего не найдено 😢</p>
       ) : (
+
         <div style={styles.grid}>
           {filteredProducts.map(product => (
             <ProductCard key={product.id} product={product} />

@@ -86,6 +86,22 @@ const OrderModel = {
         }
 
         return orders;
+    },
+
+        // Получить категории из купленных товаров пользователя
+    getUserPreferences: async (userId) => {
+        const [rows] = await db.query(`
+            SELECT p.recipient_type, p.occasion, COUNT(*) as count
+            FROM order_items oi
+            JOIN orders o ON oi.order_id = o.id
+            JOIN products p ON oi.product_id = p.id
+            WHERE o.user_id = ?
+            GROUP BY p.recipient_type, p.occasion
+            ORDER BY count DESC
+            LIMIT 1
+        `, [userId]);
+        
+        return rows[0]; // Вернет самую частую категорию (или undefined, если покупок нет)
     }
 };
 

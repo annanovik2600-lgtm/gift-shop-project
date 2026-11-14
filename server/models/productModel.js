@@ -62,6 +62,45 @@ const ProductModel = {
         return result.affectedRows;
     },
 
+        // Получить рекомендованные товары
+    getRecommendations: async (recipientType, occasion, userId) => {
+        let query = `
+            SELECT p.*, c.name AS category_name 
+            FROM products p
+            LEFT JOIN categories c ON p.category_id = c.id
+            WHERE p.is_active = 1 
+            AND p.id NOT IN (SELECT product_id FROM order_items oi JOIN orders o ON oi.order_id = o.id WHERE o.user_id = ?)
+        `;
+        const params = [userId];
+
+        // Если у пользователя есть предпочтения, фильтруем по ним
+        if (recipientType) {
+            query += ` AND p.recipient_type = ?`;
+            params.push(recipientType);
+        }
+        if (occasion) {
+            query += ` AND p.occasion = ?`;
+            params.push(occasion);
+        }
+
+        // Сортируем по рейтингу и ограничиваем 4 товарами
+        query += ` ORDER BY p.rating DESC, p.created_at DESC LIMIT 4`;
+
+        const [rows] = await db.query(query, params);
+        return rows;
+    },
+
+        getBySupplierId: async (supplierId) => {
+        const [rows] = await db.query(`
+            SELECT p.*, c.name AS category_name 
+            FROM products p
+            LEFT JOIN categories c ON p.category_id = c.id
+            WHERE p.supplier_id = ?
+            ORDER BY p.created_at DESC
+        `, [supplierId]);
+        return rows;
+    },
+
     deleteProduct: async (id) => {
         const [result] = await db.query('DELETE FROM products WHERE id = ?', [id]); // Полное удаление для модерации
         return result.affectedRows;

@@ -45,6 +45,15 @@ const ProductController = {
         }
     },
 
+        getMyProducts: async (req, res) => {
+        try {
+            const products = await ProductService.getSupplierProducts(req.user.id);
+            res.status(200).json(products);
+        } catch (error) {
+            res.status(400).json({ error: error.message });
+        }
+    },
+
     changeStatus: async (req, res) => {
         try {
             const result = await ProductService.changeStatus(req.params.id, req.body.is_active);
