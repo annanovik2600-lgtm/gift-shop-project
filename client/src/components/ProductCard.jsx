@@ -1,6 +1,6 @@
 // client/src/components/ProductCard.jsx
 import React, { useContext, useState} from 'react';
-import { useNavigate } from 'react-router-dom'; // Импортируем навигацию
+import { useNavigate, Link } from 'react-router-dom'; // Импортируем навигацию
 import { CartContext } from '../context/CartContext';
 import Toast from './Toast';
 
@@ -32,29 +32,37 @@ const ProductCard = ({ product }) => {
 
   return (
     <div style={styles.card}>
-     <div style={styles.imagePlaceholder}>
-        {product.image_url ? (
-          <img 
-            src={`http://localhost:5000${product.image_url}`} 
-            alt={product.name} 
-            style={{ 
-              width: '100%', 
-              height: '100%', 
-              objectFit: 'contain', // <--- ВОТ ГЛАВНОЕ ИЗМЕНЕНИЕ (вписывает целиком)
-              backgroundColor: '#fff', // Белый фон для пустых мест
-              padding: '0px' // Небольшой отступ от краев
-            }} 
-          />
-        ) : (
-          <span>🎁</span>
-        )}
-      </div>
+      
+      {/* Оборачиваем картинку и название в Link для перехода на страницу товара */}
+      <Link to={`/product/${product.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+        <div style={styles.imagePlaceholder}>
+          {product.image_url ? (
+            <img 
+              src={`http://localhost:5000${product.image_url}`} 
+              alt={product.name} 
+              style={{ 
+                width: '100%', 
+                height: '100%', 
+                objectFit: 'contain',
+                backgroundColor: '#fff', 
+                padding: '0px'
+              }} 
+            />
+          ) : (
+            <span>🎁</span>
+          )}
+        </div>
+        
+        <div style={{ padding: '20px 20px 0 20px' }}>
+          <h3 style={styles.title}>{product.name}</h3>
+        </div>
+      </Link>
+
+      {/* Описание и кнопка остаются вне ссылки, чтобы кнопка работала корректно */}
       <div style={styles.content}>
-        <h3 style={styles.title}>{product.name}</h3>
         <p style={styles.description}>{product.description}</p>
         <div style={styles.footer}>
           <span style={styles.price}>{product.price} BYN</span>
-          {/* Вызываем нашу новую функцию */}
           <button 
             onClick={handleAddToCart} 
             style={styles.button} 
@@ -65,7 +73,6 @@ const ProductCard = ({ product }) => {
         </div>
       </div>
       
-      {/* ВОТ ЗДЕСЬ ДОБАВЛЯЕМ УВЕДОМЛЕНИЕ */}
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       
     </div>

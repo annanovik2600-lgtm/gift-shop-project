@@ -10,6 +10,7 @@ import SupplierPanel from './pages/SupplierPanel'; // <-- Импорт пане�
 import { CartContext } from './context/CartContext'; 
 import logoImg from './assets/logo.png';
 import MyOrders from './pages/MyOrders';
+import ProductPage from './pages/ProductPage';
 
 function App() {
   const navigate = useNavigate();
@@ -81,6 +82,7 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/supplier" element={<SupplierPanel />} /> {/* <-- Маршрут поставщика */}
           <Route path="/my-orders" element={<MyOrders />} />
+          <Route path="/product/:id" element={<ProductPage />} />
         </Routes>
       </main>
     </div>
