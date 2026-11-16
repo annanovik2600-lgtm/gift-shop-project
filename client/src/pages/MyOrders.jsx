@@ -54,7 +54,7 @@ const MyOrders = () => {
       
       {orders.length === 0 ? (
         <div style={{ textAlign: 'center', marginTop: '50px' }}>
-          <p style={{ fontSize: '18px', color: '#666' }}>У вас пока нет заказов 😢</p>
+          <p style={{ fontSize: '18px', color: '#666' }}>У вас пока нет заказов </p>
           <button onClick={() => navigate('/')} style={styles.goShopBtn}>Перейти в каталог</button>
         </div>
       ) : (
@@ -80,7 +80,7 @@ const MyOrders = () => {
                 {order.items && order.items.map((item, index) => (
                   <div key={index} style={styles.itemRow}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                      <span style={{ fontSize: '24px' }}>🎁</span>
+                      <span style={{ fontSize: '24px' }}></span>
                       <span style={{ fontWeight: '600' }}>{item.name}</span>
                     </div>
                     <span style={{ color: '#666' }}>

@@ -7,6 +7,8 @@ const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const recommendationRoutes = require('./routes/recommendationRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
+
 require('dotenv').config();
 
 const app = express();
@@ -21,6 +23,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/analytics', analyticsRoutes);
 // Запуск сервера
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

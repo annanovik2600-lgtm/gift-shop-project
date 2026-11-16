@@ -12,6 +12,10 @@ const Catalog = () => {
   const [filterRecipient, setFilterRecipient] = useState('Для всех');
   const [filterOccasion, setFilterOccasion] = useState('Без повода');
 
+  // Состояния для пагинации
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8; // Количество товаров на одной странице
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -32,6 +36,22 @@ const Catalog = () => {
     const matchOccasion = filterOccasion === 'Без повода' || p.occasion === filterOccasion;
     return matchRecipient && matchOccasion;
   });
+
+  // Сброс страницы на 1 при изменении фильтров
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterRecipient, filterOccasion]);
+
+  // Логика пагинации
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // Плавный скролл наверх при смене страницы
+  };
 
   if (loading) return <h2 style={{ textAlign: 'center', marginTop: '50px' }}>Загрузка...</h2>;
 
@@ -64,16 +84,54 @@ const Catalog = () => {
         </div>
       </div>
       
+      {/* Блок рекомендаций */}
       <Recommendations />
+
       {filteredProducts.length === 0 ? (
         <p style={{ textAlign: 'center', fontSize: '18px', marginTop: '40px' }}>По вашему запросу ничего не найдено 😢</p>
       ) : (
+        <>
+          <div style={styles.grid}>
+            {currentItems.map(product => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
 
-        <div style={styles.grid}>
-          {filteredProducts.map(product => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+          {/* Блок пагинации (показываем, только если страниц больше 1) */}
+          {totalPages > 1 && (
+            <div style={styles.pagination}>
+              <button 
+                onClick={() => paginate(currentPage - 1)} 
+                disabled={currentPage === 1}
+                style={{...styles.pageBtn, opacity: currentPage === 1 ? 0.5 : 1}}
+              >
+                Назад
+              </button>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(number => (
+                <button
+                  key={number}
+                  onClick={() => paginate(number)}
+                  style={{
+                    ...styles.pageBtn,
+                    backgroundColor: currentPage === number ? 'var(--pink-dark)' : '#fff',
+                    color: currentPage === number ? '#fff' : '#2c3e50'
+                  }}
+                >
+                  {number}
+                </button>
+              ))}
+
+              <button 
+                onClick={() => paginate(currentPage + 1)} 
+                disabled={currentPage === totalPages}
+                style={{...styles.pageBtn, opacity: currentPage === totalPages ? 0.5 : 1}}
+              >
+                Вперед
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -85,7 +143,21 @@ const styles = {
   filterBar: { display: 'flex', justifyContent: 'center', gap: '30px', marginBottom: '40px', backgroundColor: 'rgba(255,255,255,0.7)', padding: '20px', borderRadius: '15px', backdropFilter: 'blur(10px)' },
   filterLabel: { fontWeight: 'bold', color: '#2c3e50', marginRight: '10px' },
   select: { padding: '10px', borderRadius: '10px', border: '1px solid #ccc', fontSize: '15px', fontFamily: 'Nunito, sans-serif', outline: 'none', cursor: 'pointer' },
-  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px' }
+  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px' },
+  
+  // Стили для пагинации
+  pagination: { display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', marginTop: '40px', marginBottom: '20px' },
+  pageBtn: { 
+    padding: '10px 15px', 
+    border: '1px solid #ddd', 
+    borderRadius: '10px', 
+    cursor: 'pointer', 
+    fontWeight: 'bold', 
+    fontSize: '16px',
+    transition: 'all 0.2s',
+    backgroundColor: '#fff',
+    color: '#2c3e50'
+  }
 };
 
 export default Catalog;

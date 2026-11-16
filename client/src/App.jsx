@@ -11,6 +11,8 @@ import { CartContext } from './context/CartContext';
 import logoImg from './assets/logo.png';
 import MyOrders from './pages/MyOrders';
 import ProductPage from './pages/ProductPage';
+import AdminAnalytics from './pages/AdminAnalytics';
+import SupplierAnalytics from './pages/SupplierAnalytics';
 
 function App() {
   const navigate = useNavigate();
@@ -57,6 +59,13 @@ function App() {
             <Link to="/supplier" style={styles.navLink}>Кабинет поставщика</Link>
           )}
 
+          {user?.role === 'admin' && (
+  <Link to="/admin-analytics" style={styles.navLink}>Аналитика</Link>
+)}
+{user?.role === 'supplier' && (
+  <Link to="/supplier-analytics" style={styles.navLink}>Моя статистика</Link>
+)}
+
           {!token ? (
             <>
               <Link to="/login" style={styles.navLink}>Войти</Link>
@@ -83,6 +92,8 @@ function App() {
           <Route path="/supplier" element={<SupplierPanel />} /> {/* <-- Маршрут поставщика */}
           <Route path="/my-orders" element={<MyOrders />} />
           <Route path="/product/:id" element={<ProductPage />} />
+          <Route path="/admin-analytics" element={<AdminAnalytics />} />
+          <Route path="/supplier-analytics" element={<SupplierAnalytics />} />
         </Routes>
       </main>
     </div>
